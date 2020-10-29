@@ -83,7 +83,7 @@ public class MainAction extends AnAction {
         ClassOrInterfaceDeclaration finalClass = cu.addClass(className.get(0)+"Stub");
 
         cu.addImport("com.successfactors.unittest.dsl.api.mock.IInvocationHandler");
-        cu.addImport("com.successfactors.unittest.dsl.mock.DslMock");
+        cu.addImport("com.successfactors.unittest.dsl.mock.DslMocker");
         cu.addImport("com.successfactors.unittest.dsl.mock.MethodObjectGenerator");
         cu.addImport("java.lang.reflect.Method");
 
@@ -111,7 +111,7 @@ public class MainAction extends AnAction {
                     "\t\ttry {\n" +
                     "\t\t\tMethod me = (new MethodObjectGenerator() {\n" +
                     "\t\t\t}).getMethod();\n" +
-                    "\t\t\tObject returnObject = invocationHandler.handle(DslMock.generateInvocation(this, me));\n" +
+                    "\t\t\tObject returnObject = invocationHandler.handle(DslMocker.generateInvocation(this, me));\n" +
                     "\t\t\tif (!invocationHandler.isInvokeRealMethod(returnObject)) {\n" +
                     "\t\t\t\treturn (String) returnObject;\n" +
                     "\t\t\t}\n\t\t} ";
