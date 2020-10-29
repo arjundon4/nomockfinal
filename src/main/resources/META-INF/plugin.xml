@@ -1,19 +1,13 @@
 <idea-plugin>
     <id>com.sf.nomockfinal</id>
-    <name>Plugin display name here</name>
-    <vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>
+    <name>No Mock Stub Generator</name>
+    <vendor email="arjun.vinod@sap.com" url="https://github.com/arjundon4/nomockfinal">No Mock Stub Generator</vendor>
 
-    <description><![CDATA[
-    Enter short description for your plugin here.<br>
-    <em>most HTML tags may be used</em>
-    ]]></description>
+    <description><![CDATA[Plugin to generator Stub class for No Mock Framework]]></description>
 
-    <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
-         on how to target different products -->
     <depends>com.intellij.modules.platform</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <!-- Add your extensions here -->
     </extensions>
 
     <actions>
@@ -23,13 +17,6 @@
                 text="Create NoMock Boilerplate Code"
                 description="Create boilerplate code with custom implementation for No Mock Framework">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
-        </action>
-        <action
-                id="SF.NOMockFramework.ToolsMenu"
-                class="com.sap.sf.nomockfw.MainAction"
-                text="Create NoMock Boilerplate Code"
-                description="Create boilerplate code with custom implementation for No Mock Framework">
-            <add-to-group group-id="ToolsMenu" anchor="last"/>
         </action>
     </actions>
 </idea-plugin>
