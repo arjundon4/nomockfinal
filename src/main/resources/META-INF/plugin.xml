@@ -14,7 +14,7 @@
         <action
                 id="SF.NOMockFramework.Editor"
                 class="com.sap.sf.nomockfw.MainAction"
-                text="Create NoMock Boilerplate Code"
+                text="Create NoMock Stub"
                 description="Create boilerplate code with custom implementation for No Mock Framework">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>

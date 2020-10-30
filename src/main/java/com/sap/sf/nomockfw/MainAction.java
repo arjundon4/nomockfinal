@@ -14,6 +14,7 @@ import com.github.javaparser.ast.expr.ThisExpr;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.type.ReferenceType;
+import com.github.javaparser.ast.type.VoidType;
 import com.github.javaparser.ast.visitor.VoidVisitor;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -68,7 +69,8 @@ public class MainAction extends AnAction {
         VoidVisitor<List<String>> classNameCollector = new ClassNameCollector();
         classNameCollector.visit(existingFileCU, className);
         ClassOrInterfaceDeclaration finalClass = stubFileCU.addClass(className.get(0)+"Stub");
-
+        //extend base class
+        finalClass.addExtendedType(className.get(0));
         //add imports
         stubFileCU.addImport("com.successfactors.unittest.dsl.api.mock.IInvocationHandler");
         stubFileCU.addImport("com.successfactors.unittest.dsl.mock.DslMocker");
@@ -88,7 +90,7 @@ public class MainAction extends AnAction {
                                 AssignExpr.Operator.ASSIGN))));
 
         //write to file
-        String targetPath = inFilePath.replace("src\\main", "src\\test");
+        String targetPath = inFilePath.replace("src"+File.separator+"main", "src"+File.separator+"test");
         targetPath = targetPath.replace(className.get(0), className.get(0)+"Stub");
         File targetFile = new File(targetPath);
         FileUtil.createNewFile(targetFile);
@@ -104,9 +106,18 @@ public class MainAction extends AnAction {
                     "\t\t\tMethod me = (new MethodObjectGenerator() {\n" +
                     "\t\t\t}).getMethod();\n" +
                     "\t\t\tObject returnObject = invocationHandler.handle(DslMocker.generateInvocation(this, me));\n" +
-                    "\t\t\tif (!invocationHandler.isInvokeRealMethod(returnObject)) {\n" +
-                    "\t\t\t\treturn (String) returnObject;\n" +
-                    "\t\t\t}\n\t\t} ";
+                    "\t\t\tif (!invocationHandler.isInvokeRealMethod(returnObject)) {\n";
+
+            boolean isvoidType = methodToOverride.getType().isVoidType();
+            if (isvoidType) {
+                methodString = methodString + "\t\t\t\treturn;\n" +
+                        "\t\t\t}\n\t\t} ";
+            } else {
+                methodString = methodString +
+                        "\t\t\t\treturn ("+methodToOverride.getType().asString()+") returnObject;\n" +
+                        "\t\t\t}\n\t\t} ";
+            }
+
             if (!CollectionUtils.isEmpty(methodToOverride.getThrownExceptions())) {
                 for (ReferenceType referenceType:
                      methodToOverride.getThrownExceptions()) {
@@ -116,11 +127,18 @@ public class MainAction extends AnAction {
             }
             methodString = methodString + "catch (Throwable ex) {\n" +
                     "\t\t\tinvocationHandler.handleUnexpectedException(ex);\n" +
-                    "\t\t}\n" +
-                    "\t\treturn super."+methodToOverride.getNameAsString()+"(";
-            for (Parameter parameter :
-                    methodToOverride.getParameters()) {
-                methodString = methodString + parameter.getNameAsString();
+                    "\t\t}\n";
+            if(isvoidType) {
+                methodString = methodString + "\t\tsuper."+methodToOverride.getNameAsString()+"(";
+            } else {
+                methodString = methodString + "\t\treturn super."+methodToOverride.getNameAsString()+"(";
+            }
+
+            for (int i = 0; i<methodToOverride.getParameters().size(); i++) {
+                if(i==0)
+                    methodString = methodString + methodToOverride.getParameters().get(i).getNameAsString();
+                else
+                    methodString = methodString + ", " + methodToOverride.getParameters().get(i).getNameAsString();
             }
             methodString = methodString + ");\n\t}";
             FileUtil.updateFileContent(targetPath, methodString, methodPosition);
